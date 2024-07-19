@@ -1,4 +1,5 @@
-module Instructions( Opcode(..), Instruction(..), Register(..)) where
+-- module Instructions( Opcode(..), Instruction(..), Register(..)) where
+module Instructions where 
 
 --    Terms used in MIPS    --
 ------------------------------
@@ -157,3 +158,17 @@ opcodeToBinary op = case op of
 --                                         RType -> writeRTypeBinary instruction
 --                                         JType -> writeJTypeBinary instruction
 --                                         IType -> writeITypeBinary instruction
+
+-- Checks if input string is a valid opcode
+isOpcode :: String -> Bool
+isOpcode op@(x:xs)
+    | null op = False
+    | otherwise = True
+
+-- Converts string from scanner into opcode enum
+toOpcode :: String -> Opcode
+toOpcode = undefined
+
+-- Converts string from scanner into register enum
+toRegister :: String -> Register
+toRegister = undefined

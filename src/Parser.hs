@@ -5,16 +5,8 @@ module Parser where
 -- import Text.Parsec
 -- import Text.Parsec.String (Parser)
 
--- import Instructions
+import Instructions
 
-
--- data Token =  Register String
---             | Immediate String
---             | Opcode String
---             | Label String
---             | Directive String (Maybe String)
---             | EOF
---             deriving(Enum, Show)
 
 -- --Start of the parser 
 -- data Line = RTypeLine Label (Instruction RType)
