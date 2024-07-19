@@ -1,27 +1,24 @@
 module Main where 
-import Instructions 
-import Scanner
 
-import Debug.Trace
+import System.Console.ArgParser
+import Scanner
+import Parser
+
+
+printTokens :: Show a => [a] -> IO ()
+printTokens [] = return ()  
+printTokens (x:stream) = do
+    putStrLn (show x) 
+    printTokens stream
 
 main :: IO()
 main = do
  
-    let filePath = "test.mips" 
-    file <- readFile filePath
+    file <- readFile "test.asm" 
 
-    --print $ lines file
+    let tokenStream = concatMap tokenize (lines file) ++ [EOF]
 
-    let tokens = concatMap tokenize (lines file)
-
-    -- let tokenst = map tokenize (lines file)
-
-    print $ show tokens 
-
-    print "FUCK"
-    -- trace("TEST " ++ show tokens) (print $ tokens)
-   -- print $ show tokens
---     map print test
-
---     mapM_ putStrLn linesOfFile 
+    -- Later add if debug flag to print stream
+    putStrLn "Token Stream"
+    printTokens tokenStream
 

@@ -23,25 +23,6 @@ NOTES:
 -Figure out Haskell's argument parsing library
 
 
-
-Shitty Grammar Idea: 
-
-  program ::= [line]
-
-  line ::= [label] instruction | directive | label
-
-  instruction ::= RTypeInstruction | ITypeInstruction | JTypeInstruction
-
-  RTypeInstruction ::= opcode rs rt rd shamt funct
-
-  ITypeInstruction ::= opcode rs rt immediate
-
-  JTypeInstruction ::= opcode address
-
-  directive ::= directiveType [operand]
-
-
-
 MIPS Instruction Set Resources:
 https://student.cs.uwaterloo.ca/~isg/res/mips/opcodes 
 https://www.d.umn.edu/~gshute/mips/directives-registers.pdf

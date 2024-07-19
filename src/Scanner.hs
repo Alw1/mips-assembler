@@ -3,26 +3,25 @@ module Scanner where
 import Data.Char (isDigit, isAlpha, isAlphaNum, isSpace)
 import Instructions 
 
-
 data Token =  LabelTok String
             | DirectiveTok String --Maybe(String) -- directive argument
-            | OpcodeTok Opcode -- Change back to Opcode later
+            | OpcodeTok Opcode
             | RegisterTok Register
             | NumberTok String 
             | ShamtTok String
             | FunctTok String
             | AddressTok String
             | ImmediateTok String
-            | EOF
+            | EOF  
             deriving(Show)
 
--- Creates Token in a given line
+-- Creates a list of all tokens in a given line
 tokenize :: String -> [Token]
 tokenize [] = []
 tokenize line@(x:xs)
-    | null xs || x == '\n' = []
+    | null xs = []
     | isSpace x || x == ',' = tokenize xs -- ignores whitespace & commas
-    | x == '#' = tokenize []             -- ignore line if comment
+    | x == '#' = tokenize []              -- ignore line if comment
     | x == '$' = tokenizeRegister xs
     | x == '.' = tokenizeDirective xs
     | isDigit x = tokenizeNumber line

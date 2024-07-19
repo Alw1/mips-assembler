@@ -2,6 +2,7 @@
 module Instructions where 
 import Data.Char (toUpper)
 
+
 --    Terms used in MIPS    --
 ------------------------------
 -- Instruction Types
@@ -60,8 +61,8 @@ data Opcode = ADD   -- arithmetic instructions
             | BEQ   -- branch instructions
             | BGTZ
             | BLEZ
-            | BLTZAL
-            | BLTZ
+            -- | BLTZAL
+            -- | BLTZ
             | BNE
             | J     -- jump instructions
             | JAL
@@ -133,7 +134,7 @@ opcodeToBinary op = case op of
                     LB -> "100000"
                     LBU -> "100100"
                     LH -> "100001"
-                    LI -> "999999" -- TEMP
+                    LI -> "999999" -- TEMP, REMOVE LATER
                     LHU -> "100101"
                     LW -> "100011"
                     SLT -> "101010"
@@ -169,3 +170,8 @@ toOpcode op = read $ map toUpper op
 -- Converts string from scanner into register enum
 toRegister :: String -> Register
 toRegister register = read $ map toUpper register
+
+-- Note: add custom error for when string to enum conversion fails
+-- to find an existing register or opcode 
+
+
