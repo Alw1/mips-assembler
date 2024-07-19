@@ -8,7 +8,7 @@ main = do
     let test = [IType{ op = ADD, rs = 1, rt = 2, immediate = 10 },
                 JType{ op = J, address = 102}]
    
-    let testTok = ".directive $A0 $B1 $FUCK #DONT TAKE THIS"
+    let testTok = ".global $A0 $B1  "
 
     let tokens = tokenize testTok
 

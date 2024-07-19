@@ -1,5 +1,6 @@
 -- module Instructions( Opcode(..), Instruction(..), Register(..)) where
 module Instructions where 
+import Data.Char (toUpper)
 
 --    Terms used in MIPS    --
 ------------------------------
@@ -65,7 +66,7 @@ data Opcode = ADD   -- arithmetic instructions
             | JAL
             | JALR
             | JR
-            deriving(Enum, Show)
+            deriving(Enum, Show, Read)
 
 -- Registers Enum
 data Register = ZERO   
@@ -100,7 +101,7 @@ data Register = ZERO
               | SP     
               | FP     
               | RA     
-              deriving (Enum, Show)
+              deriving (Enum, Show, Read)
 
 -- type Register = String
 
@@ -159,16 +160,10 @@ opcodeToBinary op = case op of
 --                                         JType -> writeJTypeBinary instruction
 --                                         IType -> writeITypeBinary instruction
 
--- Checks if input string is a valid opcode
-isOpcode :: String -> Bool
-isOpcode op@(x:xs)
-    | null op = False
-    | otherwise = True
-
 -- Converts string from scanner into opcode enum
 toOpcode :: String -> Opcode
-toOpcode = undefined
+toOpcode op = read $ map toUpper op
 
 -- Converts string from scanner into register enum
 toRegister :: String -> Register
-toRegister = undefined
+toRegister register = read $ map toUpper register

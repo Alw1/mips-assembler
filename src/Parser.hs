@@ -6,7 +6,7 @@ module Parser where
 -- import Text.Parsec.String (Parser)
 
 import Instructions
-
+import Scanner
 
 -- --Start of the parser 
 -- data Line = RTypeLine Label (Instruction RType)
