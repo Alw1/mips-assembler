@@ -26,20 +26,22 @@ NOTES:
 
 Shitty Grammar Idea: 
 
--- Program <- lines*
+  program ::= [line]
 
--- lines <-  directive  |  label? instruction 
+  line ::= [label] instruction | directive | label
 
--- instruction <- RType-Instruction | IType-Instruction | JType-Instruction
+  instruction ::= RTypeInstruction | ITypeInstruction | JTypeInstruction
 
---  RType-Instruction <- opcode rs rd rt shamt funct
+  RTypeInstruction ::= opcode rs rt rd shamt funct
 
---  IType-Instruction <- opcode rs rt immediate
+  ITypeInstruction ::= opcode rs rt immediate
 
---  JType-Instruction <- opcode address
+  JTypeInstruction ::= opcode address
 
---Terminals: directive, label, opcode, rs, rd rt, shamt, funct, address
+  directive ::= directiveType [operand]
 
 
-Resources:
+
+MIPS Instruction Set Resources:
 https://student.cs.uwaterloo.ca/~isg/res/mips/opcodes 
+https://www.d.umn.edu/~gshute/mips/directives-registers.pdf
