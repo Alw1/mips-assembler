@@ -1,4 +1,5 @@
 module Instructions( Opcode(..), Instruction(..)) where
+
 --    Terms used in MIPS    --
 ------------------------------
 -- Instruction Types
@@ -110,11 +111,11 @@ opcodeToBinary op = case op of
                     JR -> "001000"
 
 
-generateInstructionBinary :: Instruction -> String
-generateInstructionBinary instr = case instr of 
-                                    RType -> opcodeToBinary instr.op ++ instr.rs ++ instr.rt ++ instr.rd + instr.shamt ++ instr.funct
-                                    IType -> opcodeToBinary instr.op ++ instr.rs ++ instr.rt ++ instr.immediate
-                                    JType -> opcodeToBinary instr.op ++ instr.address
+-- generateInstructionBinary :: Instruction -> String
+-- generateInstructionBinary instr = case instr of 
+--                                     RType {} -> opcodeToBinary instr.op ++ instr.rs ++ instr.rt ++ instr.rd + instr.shamt ++ instr.funct
+--                                     IType {} -> opcodeToBinary instr.op ++ instr.rs ++ instr.rt ++ instr.immediate
+--                                     JType {} -> opcodeToBinary instr.op ++ instr.address
 
 -- writeInstructionBinary :: Instruction -> String
 -- writeInstructionBinary instruction = case instruction of
