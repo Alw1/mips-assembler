@@ -2,23 +2,25 @@ module Main where
 import Instructions 
 import Scanner
 
+import Debug.Trace
+
 main :: IO()
 main = do
  
-    let test = [IType{ op = ADD, rs = 1, rt = 2, immediate = 10 },
-                JType{ op = J, address = 102}]
-   
-    let testTok = ".global $A0 $B1  "
+    let filePath = "test.mips" 
+    file <- readFile filePath
 
-    let tokens = tokenize testTok
+    --print $ lines file
 
-    print tokens
+    let tokens = concatMap tokenize (lines file)
 
---     let filePath = "tests/hello.asm" 
+    -- let tokenst = map tokenize (lines file)
 
---     contents <- readFile filePath
---     let linesOfFile = lines contents
+    print $ show tokens 
 
+    print "FUCK"
+    -- trace("TEST " ++ show tokens) (print $ tokens)
+   -- print $ show tokens
 --     map print test
 
 --     mapM_ putStrLn linesOfFile 

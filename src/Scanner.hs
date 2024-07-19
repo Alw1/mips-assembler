@@ -1,9 +1,8 @@
 module Scanner where
 
 import Data.Char (isDigit, isAlpha, isAlphaNum, isSpace)
-import qualified Data.Text as T
-
 import Instructions 
+
 
 data Token =  LabelTok String
             | DirectiveTok String --Maybe(String) -- directive argument
@@ -19,8 +18,9 @@ data Token =  LabelTok String
 
 -- Creates Token in a given line
 tokenize :: String -> [Token]
+tokenize [] = []
 tokenize line@(x:xs)
-    | null xs = []
+    | null xs || x == '\n' = []
     | isSpace x || x == ',' = tokenize xs -- ignores whitespace & commas
     | x == '#' = tokenize []             -- ignore line if comment
     | x == '$' = tokenizeRegister xs

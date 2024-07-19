@@ -54,6 +54,7 @@ data Opcode = ADD   -- arithmetic instructions
             | LB  -- load instructions
             | LBU 
             | LH
+            | LI
             | LHU  
             | LW
             | BEQ   -- branch instructions
@@ -132,6 +133,7 @@ opcodeToBinary op = case op of
                     LB -> "100000"
                     LBU -> "100100"
                     LH -> "100001"
+                    LI -> "999999" -- TEMP
                     LHU -> "100101"
                     LW -> "100011"
                     SLT -> "101010"
