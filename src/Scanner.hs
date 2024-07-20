@@ -7,7 +7,8 @@ data Token =  LabelTok String
             | DirectiveTok String --Maybe(String) -- directive argument
             | OpcodeTok Opcode
             | RegisterTok Register
-            | NumberTok String 
+            | NumberTok String
+            | MemoryTok String -- Not used in scanning, used in assigning address to directives and labels 
             deriving(Show, Eq)
 
 -- Creates a list of all tokens in a given line
@@ -41,7 +42,7 @@ tokenizeLabel :: String -> [Token]
 tokenizeLabel [] = []
 tokenizeLabel str =  let (label, line_tail) = span isAlphaNum str
                      in 
-                     if not (null line_tail) && head line_tail == ':' then 
+                     if (not . null) line_tail && head line_tail == ':' then 
                         LabelTok label : tokenize (tail line_tail)
                      else 
                         tokenizeOpcode str 
@@ -50,6 +51,17 @@ tokenizeOpcode :: String -> [Token]
 tokenizeOpcode [] = []
 tokenizeOpcode str = let (op, line_tail) = span isAlpha str
                      in OpcodeTok (toOpcode op) : tokenize line_tail
+
+
+-- Transform labels and directives in memory addresses
+assignMemory :: [Token] -> Int -> [Token]
+assignMemory [] _ = []
+assignMemory (x:xs) addr = case x of
+                      LabelTok a -> MemoryTok (show addr) : assignMemory xs (addr + size)
+                      DirectiveTok a -> MemoryTok (show addr) : assignMemory xs (addr + size)
+                      _ -> x : assignMemory xs addr
+                      where
+                        size = 0x10 --Size of memory to be allocated
 
 -- Add error checking in directive and register tokenizations
 -- if the remaining length is 1 and the current char is . or $

@@ -2,7 +2,6 @@ module Parser where
 
 import Scanner
 import Instructions 
-import Control.Monad.State(State)
 
 --   MIPS Grammar
 --   program ::= [line]
@@ -28,12 +27,5 @@ generateCode (tok:buff) = case tok of
                             NumberTok a -> a ++ generateCode buff
                             RegisterTok a -> registerToBinary a ++ generateCode buff
                             DirectiveTok a -> a ++ generateCode buff
+                            MemoryTok a -> a ++ generateCode buff
                            
---  -- Placeholder memory address
--- startAddress = 0x0100
-
--- -- Assigns memory addreses to labels & directives
--- assignMemoryAddress :: [Token] -> [Token]
--- assignMemoryAddress [] = []
--- assignMemoryAddress tokens@(x:xs) = case tokens of 
---                                     Label x -> 
