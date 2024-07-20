@@ -158,7 +158,8 @@ registerToBinary op = case op of
                     A2 -> "011010"
                     A3  -> "011011"
                     T0 -> "011000"
-                    T1 -> "011001"
+                    T1 -> "011001" 
+                    T2 -> "011001"
                     T3 -> "011001"
                     T4 -> "011001"
                     T5 -> "011001"
@@ -180,7 +181,7 @@ registerToBinary op = case op of
                     SP -> "000011"
                     FP -> "000111"
                     RA -> "000010"
-                    _ -> "AAAAA"
+    
 
 numberToBinary :: String -> String
 numberToBinary num = undefined

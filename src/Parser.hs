@@ -2,6 +2,7 @@ module Parser where
 
 import Scanner
 import Instructions 
+import Text.Printf (printf)
 
 --   MIPS Grammar
 --   program ::= [line]
@@ -24,7 +25,7 @@ generateCode [] = ""
 generateCode (tok:buff) = case tok of 
                             LabelTok a -> a ++ generateCode buff
                             OpcodeTok a -> opcodeToBinary a ++ generateCode buff
-                            NumberTok a -> a ++ generateCode buff
+                            NumberTok a -> printf "%b" a ++ generateCode buff
                             RegisterTok a -> registerToBinary a ++ generateCode buff
                             DirectiveTok a -> a ++ generateCode buff
                             MemoryTok a -> a ++ generateCode buff

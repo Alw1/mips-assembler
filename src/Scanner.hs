@@ -2,12 +2,13 @@ module Scanner where
 
 import Data.Char (isDigit, isAlpha, isAlphaNum, isSpace)
 import Instructions 
+import Text.Printf (printf)
 
 data Token =  LabelTok String
             | DirectiveTok String --Maybe(String) -- directive argument
             | OpcodeTok Opcode
             | RegisterTok Register
-            | NumberTok String
+            | NumberTok Int
             | MemoryTok String -- Not used in scanning, used in assigning address to directives and labels 
             deriving(Show, Eq)
 
@@ -31,7 +32,7 @@ tokenizeRegister line = let (register, line_tail) = span isAlphaNum line
 tokenizeNumber :: String -> [Token]
 tokenizeNumber [] = []
 tokenizeNumber line = let (num, line_tail) = span isDigit line
-                      in NumberTok num : tokenize line_tail
+                      in NumberTok  (read num) : tokenize line_tail
 
 tokenizeDirective :: String -> [Token]
 tokenizeDirective [] = []
@@ -57,11 +58,12 @@ tokenizeOpcode str = let (op, line_tail) = span isAlpha str
 assignMemory :: [Token] -> Int -> [Token]
 assignMemory [] _ = []
 assignMemory (x:xs) addr = case x of
-                      LabelTok a -> MemoryTok (show addr) : assignMemory xs (addr + size)
-                      DirectiveTok a -> MemoryTok (show addr) : assignMemory xs (addr + size)
+                      LabelTok a -> MemoryTok (printf "%b" addr) : assignMemory xs (addr + size)
+                      DirectiveTok a -> MemoryTok (printf "%b" addr) : assignMemory xs (addr + size)
                       _ -> x : assignMemory xs addr
                       where
                         size = 0x10 --Size of memory to be allocated
+             
 
 -- Add error checking in directive and register tokenizations
 -- if the remaining length is 1 and the current char is . or $

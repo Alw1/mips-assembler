@@ -35,3 +35,7 @@ main = do
     putStrLn "\n\nToken Stream"
     print temp
 
+    putStrLn "\n\nSource File"
+    putStrLn file
+
+
