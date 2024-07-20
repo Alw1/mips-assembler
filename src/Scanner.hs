@@ -8,11 +8,10 @@ data Token =  LabelTok String
             | OpcodeTok Opcode
             | RegisterTok Register
             | NumberTok String 
-            | ShamtTok String
-            | FunctTok String
-            | AddressTok String
-            | ImmediateTok String
-            | EOF  
+            -- | ShamtTok String
+            -- | FunctTok String
+            -- | AddressTok String
+            -- | ImmediateTok String
             deriving(Show, Eq)
 
 -- Creates a list of all tokens in a given line
@@ -23,7 +22,7 @@ tokenize line@(x:xs)
     | null xs = []
     | isAlpha x = tokenizeOpcode line
     | isSpace x || x == ',' = tokenize xs -- ignores whitespace & commas
-    | x == '#' = tokenize []              -- ignore line if comment
+    | x == '#' = tokenize []              -- ignore line if its a comment
     | x == '$' = tokenizeRegister xs
     | x == '.' = tokenizeDirective xs
     | otherwise = error $ "[Scanner Error] Unexpected input in line" ++ line
@@ -46,7 +45,11 @@ tokenizeDirective str = let (dir, line_tail) = span isAlpha str
 tokenizeLabel :: String -> [Token]
 tokenizeLabel [] = []
 tokenizeLabel str = let (label, line_tail) = span isAlphaNum str
-                    in LabelTok label : tokenize line_tail
+                    in 
+                        if head line_tail == ':' then
+                            LabelTok label : tokenize(tail line_tail)
+                        else
+                            error "[Parse Error] Invalid label: " 
      
 tokenizeOpcode :: String -> [Token]
 tokenizeOpcode [] = []

@@ -1,9 +1,10 @@
 module Parser where 
 
 import Scanner
+import Instructions 
+-- import Control.Monad.State
 
 --   MIPS Grammar
-
 --   program ::= [line]
 --   line ::= [label] instruction | directive | label
 --   instruction ::= RTypeInstruction | ITypeInstruction | JTypeInstruction
@@ -12,36 +13,20 @@ import Scanner
 --   JTypeInstruction ::= opcode address
 --   directive ::= directiveType [operand]
 
--- either returns an error (String) or a tuple with the next production function and the current token stream (a ,[Token])
-type Parser a = (a, [Token]) -> Either (a, [Token]) String
+-- Uses the state monad to update token buffer
+-- State, Token Buffer, Current Nonterminal, Current Memory Address
+-- type Parser a = State [Token] a Int
 
-
-parseMIPS :: Parser a -> String
-parseMIPS parser = do
-                   undefined
-
-
--- line ::= [label] instruction | directive | label
--- line :: Parser String
--- line = do
---     -- case currentToken Parser of
---     --     LabelTok -> InstructionProd
---     --     DirectiveTok -> DirectiveProd
---     --     OpcodeTok -> InstructionProd
-        
-
-
--- lineParser :: Parser Line
-
--- -- Example of using the line parser
--- parseLines :: String -> Either ParseError [Line]
--- parseLines input = parse (many lineParser) "" input
-
-
-
--- --Start of the parser 
-
- 
+--Temporary function until parser is made
+generateCode :: [Token] -> String
+generateCode [] = ""
+generateCode (tok:buff) = case tok of 
+                            LabelTok a -> a ++ generateCode buff
+                            OpcodeTok a -> opcodeToBinary a ++ generateCode buff
+                            NumberTok a -> a ++ generateCode buff
+                            RegisterTok a -> show a ++ generateCode buff
+                            DirectiveTok a -> a ++ generateCode buff
+                           
 --  -- Placeholder memory address
 -- startAddress = 0x0100
 

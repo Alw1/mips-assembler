@@ -16,15 +16,20 @@ main = do
     file <- readFile "test.asm" 
 
     -- flat array of all tokens
-    let tokenStream = concatMap tokenize (lines file) ++ [EOF]
+    let tokenStream = map tokenize (lines file) 
+
+    let code = map generateCode tokenStream
+
+    putStrLn "Generated Code"
+    printTokens code
 
     -- Parser starting at first production
-    let parser = parseMIPS tokenStream
+    -- let parser = parseMIPS tokenStream
 
-    let bytecode = case parser of
-                    Right err -> print err
-                    Left program -> print program
-    -- in 
+    -- let bytecode = case parser of
+    --                 Right err -> print err
+    --                 Left program -> print program
+    -- -- in 
     --     print bytecode
 
     -- Later add if debug flag to print stream
