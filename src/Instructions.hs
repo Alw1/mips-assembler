@@ -68,7 +68,7 @@ data Opcode = ADD   -- arithmetic instructions
             | JAL
             | JALR
             | JR
-            deriving(Enum, Show, Read)
+            deriving(Enum, Show, Read, Eq)
 
 -- Registers Enum
 data Register = ZERO   
@@ -103,7 +103,7 @@ data Register = ZERO
               | SP     
               | FP     
               | RA     
-              deriving (Enum, Show, Read)
+              deriving (Enum, Show, Read, Eq)
 
 -- type Register = String
 

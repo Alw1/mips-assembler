@@ -13,19 +13,19 @@ data Token =  LabelTok String
             | AddressTok String
             | ImmediateTok String
             | EOF  
-            deriving(Show)
+            deriving(Show, Eq)
 
 -- Creates a list of all tokens in a given line
 tokenize :: String -> [Token]
 tokenize [] = []
 tokenize line@(x:xs)
+    | isDigit x = tokenizeNumber line
     | null xs = []
+    | isAlpha x = tokenizeOpcode line
     | isSpace x || x == ',' = tokenize xs -- ignores whitespace & commas
     | x == '#' = tokenize []              -- ignore line if comment
     | x == '$' = tokenizeRegister xs
     | x == '.' = tokenizeDirective xs
-    | isDigit x = tokenizeNumber line
-    | isAlpha x = tokenizeOpcode line
     | otherwise = error $ "[Scanner Error] Unexpected input in line" ++ line
 
 tokenizeRegister :: String -> [Token]

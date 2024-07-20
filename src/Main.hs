@@ -1,6 +1,6 @@
 module Main where 
 
-import System.Console.ArgParser
+-- import System.Console.ArgParser
 import Scanner
 import Parser
 
@@ -17,6 +17,10 @@ main = do
     file <- readFile "test.asm" 
 
     let tokenStream = concatMap tokenize (lines file) ++ [EOF]
+
+    case parseMIPS file of
+        Left err -> print err
+        Right program -> print program
 
     -- Later add if debug flag to print stream
     putStrLn "Token Stream"

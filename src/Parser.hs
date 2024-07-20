@@ -1,40 +1,44 @@
 module Parser where 
 
--- import Text.Parsec
--- import Text.Parsec.String (Parser)
--- import Instructions
--- import Scanner
+import Scanner
 
--- -- import Text.Parsec (ParseError)
--- import Text.Parsec
--- import Control.Monad (void)
--- -- import Text.Parsec.String.Parsec (try)
--- -- import Text.Parsec.String.Char (oneOf, char, digit, satisfy)
--- -- import Text.Parsec.String.Combinator (many1, choice, chainl1)
--- -- import Control.Applicative ((<|>), many)
--- -- import Control.Monad (void)
--- -- import Data.Char (isLetter, isDigit)
--- -- import FunctionsAndTypesForParsing
+--   MIPS Grammar
 
--- --   MIPS Grammar
+--   program ::= [line]
+--   line ::= [label] instruction | directive | label
+--   instruction ::= RTypeInstruction | ITypeInstruction | JTypeInstruction
+--   RTypeInstruction ::= opcode rs rt rd shamt funct
+--   ITypeInstruction ::= opcode rs rt immediate
+--   JTypeInstruction ::= opcode address
+--   directive ::= directiveType [operand]
 
--- --   program ::= [line]
--- --   line ::= [label] instruction | directive | label
--- --   instruction ::= RTypeInstruction | ITypeInstruction | JTypeInstruction
--- --   RTypeInstruction ::= opcode rs rt rd shamt funct
--- --   ITypeInstruction ::= opcode rs rt immediate
--- --   JTypeInstruction ::= opcode address
--- --   directive ::= directiveType [operand]
+type Parser a = [Token] -> Either String (a, [Token])
 
--- -- type Label = Token::LabelTok
+eatToken :: Token -> Parser Token
+eatToken _ [] = Left "Unexpected end of input"
+eatToken expected (t:ts)
+    | t == expected = return (t, ts)
+    | otherwise     = Left ("Expected " ++ show expected ++ ", but got " ++ show t)
 
--- -- data Line = RTypeLine Token Instruction
--- --           | ITypeLine Token Instruction
--- --           | JTypeLine Token Instruction
--- --           | LabelLine Token 
--- --           | DirectiveLine Token
+-- currentToken :: Parser a -> Token
+-- currentToken stream = head stream
+
+-- currentToken :: Parser a -> Token
+-- currentToken stream = take 1 stream
+
+-- program :: [Token] -> String
+-- program [] = ""
+-- program stream = 
 
 
+-- line ::= [label] instruction | directive | label
+-- line :: Parser String
+-- line = do
+--     -- case currentToken Parser of
+--     --     LabelTok -> InstructionProd
+--     --     DirectiveTok -> DirectiveProd
+--     --     OpcodeTok -> InstructionProd
+        
 -- lineParser :: Parser Line
 -- lineParser = choice
 --     [ RTypeLine <$> (string "RType" *> many1 (oneOf "0123456789"))
