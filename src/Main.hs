@@ -38,4 +38,6 @@ main = do
     putStrLn "\n\nSource File"
     putStrLn file
 
+    writeFile "output.bin" code  
+
 
