@@ -15,8 +15,7 @@ tokenize :: String -> [Token]
 tokenize [] = []
 tokenize line@(x:xs)
     | isDigit x = tokenizeNumber line
-    | null xs = []
-    | isAlpha x = tokenizeOpcode line
+    | isAlpha x = tokenizeLabel line
     | isSpace x || x == ',' = tokenize xs -- ignores whitespace & commas
     | x == '#' = tokenize []              -- ignore line if its a comment
     | x == '$' = tokenizeRegister xs
@@ -40,13 +39,13 @@ tokenizeDirective str = let (dir, line_tail) = span isAlpha str
       
 tokenizeLabel :: String -> [Token]
 tokenizeLabel [] = []
-tokenizeLabel str = let (label, line_tail) = span isAlphaNum str
-                    in 
-                        if head line_tail == ':' then
-                            error "[Parse Error] Invalid label: "  --LabelTok label : tokenize(tail line_tail)
-                        else
-                            error "[Parse Error] Invalid label: " 
-     
+tokenizeLabel str =  let (label, line_tail) = span isAlphaNum str
+                     in 
+                     if not (null line_tail) && head line_tail == ':' then 
+                        LabelTok label : tokenize (tail line_tail)
+                     else 
+                        tokenizeOpcode str 
+
 tokenizeOpcode :: String -> [Token]
 tokenizeOpcode [] = []
 tokenizeOpcode str = let (op, line_tail) = span isAlpha str
