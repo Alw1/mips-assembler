@@ -4,7 +4,6 @@ module Main where
 import Scanner
 import Parser
 
-
 printTokens :: Show a => [a] -> IO ()
 printTokens [] = return ()  
 printTokens (x:stream) = do
@@ -16,11 +15,17 @@ main = do
  
     file <- readFile "test.asm" 
 
+    -- flat array of all tokens
     let tokenStream = concatMap tokenize (lines file) ++ [EOF]
 
-    case parseMIPS file of
-        Left err -> print err
-        Right program -> print program
+    -- Parser starting at first production
+    let parser = parseMIPS tokenStream
+
+    let bytecode = case parser of
+                    Right err -> print err
+                    Left program -> print program
+    -- in 
+    --     print bytecode
 
     -- Later add if debug flag to print stream
     putStrLn "Token Stream"

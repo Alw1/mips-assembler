@@ -12,23 +12,13 @@ import Scanner
 --   JTypeInstruction ::= opcode address
 --   directive ::= directiveType [operand]
 
-type Parser a = [Token] -> Either String (a, [Token])
+-- either returns an error (String) or a tuple with the next production function and the current token stream (a ,[Token])
+type Parser a = (a, [Token]) -> Either (a, [Token]) String
 
-eatToken :: Token -> Parser Token
-eatToken _ [] = Left "Unexpected end of input"
-eatToken expected (t:ts)
-    | t == expected = return (t, ts)
-    | otherwise     = Left ("Expected " ++ show expected ++ ", but got " ++ show t)
 
--- currentToken :: Parser a -> Token
--- currentToken stream = head stream
-
--- currentToken :: Parser a -> Token
--- currentToken stream = take 1 stream
-
--- program :: [Token] -> String
--- program [] = ""
--- program stream = 
+parseMIPS :: Parser a -> String
+parseMIPS parser = do
+                   undefined
 
 
 -- line ::= [label] instruction | directive | label
@@ -39,14 +29,9 @@ eatToken expected (t:ts)
 --     --     DirectiveTok -> DirectiveProd
 --     --     OpcodeTok -> InstructionProd
         
+
+
 -- lineParser :: Parser Line
--- lineParser = choice
---     [ RTypeLine <$> (string "RType" *> many1 (oneOf "0123456789"))
---     , ITypeLine <$> (string "IType" *> many1 (oneOf "0123456789"))
---     , JTypeLine <$> (string "JType" *> many1 (oneOf "0123456789"))
---     , LabelLine <$> (string "Label" *> many1 (oneOf "0123456789"))
---     , DirectiveLine <$> (string "Directive" *> many1 (oneOf "0123456789"))
---     ]
 
 -- -- Example of using the line parser
 -- parseLines :: String -> Either ParseError [Line]
