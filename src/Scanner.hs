@@ -8,10 +8,6 @@ data Token =  LabelTok String
             | OpcodeTok Opcode
             | RegisterTok Register
             | NumberTok String 
-            -- | ShamtTok String
-            -- | FunctTok String
-            -- | AddressTok String
-            -- | ImmediateTok String
             deriving(Show, Eq)
 
 -- Creates a list of all tokens in a given line
@@ -47,7 +43,7 @@ tokenizeLabel [] = []
 tokenizeLabel str = let (label, line_tail) = span isAlphaNum str
                     in 
                         if head line_tail == ':' then
-                            LabelTok label : tokenize(tail line_tail)
+                            error "[Parse Error] Invalid label: "  --LabelTok label : tokenize(tail line_tail)
                         else
                             error "[Parse Error] Invalid label: " 
      

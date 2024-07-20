@@ -2,7 +2,6 @@
 module Instructions where 
 import Data.Char (toUpper)
 
-
 --    Terms used in MIPS    --
 ------------------------------
 -- Instruction Types
@@ -105,8 +104,6 @@ data Register = ZERO
               | RA     
               deriving (Enum, Show, Read, Eq)
 
--- type Register = String
-
 opcodeToBinary :: Opcode -> String
 opcodeToBinary op = case op of 
                     ADD  -> "100000"
@@ -150,18 +147,46 @@ opcodeToBinary op = case op of
                     JALR -> "001001"
                     JR -> "001000"
 
+registerToBinary :: Register -> String
+registerToBinary op = case op of 
+                    ZERO -> "100000"
+                    AT -> "100001"
+                    V0 -> "001000"
+                    V1 -> "001001"
+                    A0-> "100100"
+                    A1  -> "001100"
+                    A2 -> "011010"
+                    A3  -> "011011"
+                    T0 -> "011000"
+                    T1 -> "011001"
+                    T3 -> "011001"
+                    T4 -> "011001"
+                    T5 -> "011001"
+                    T6 -> "011001"
+                    T7 -> "011001"
+                    S0 -> "011001"
+                    S1 -> "011001"
+                    S2 -> "011001"
+                    S3 -> "011001"
+                    S4 -> "011001"
+                    S5 -> "011001"
+                    S6 -> "011001"
+                    S7 -> "011001"
+                    T8 -> "100111"
+                    T9 -> "100101"
+                    K0 -> "001101"
+                    K1 -> "000000"
+                    GP -> "000100"
+                    SP -> "000011"
+                    FP -> "000111"
+                    RA -> "000010"
+                    _ -> "AAAAA"
 
--- generateInstructionBinary :: Instruction -> String
--- generateInstructionBinary instr = case instr of 
---                                     RType {} -> opcodeToBinary instr.op ++ instr.rs ++ instr.rt ++ instr.rd + instr.shamt ++ instr.funct
---                                     IType {} -> opcodeToBinary instr.op ++ instr.rs ++ instr.rt ++ instr.immediate
---                                     JType {} -> opcodeToBinary instr.op ++ instr.address
+numberToBinary :: String -> String
+numberToBinary num = undefined
 
--- writeInstructionBinary :: Instruction -> String
--- writeInstructionBinary instruction = case instruction of
---                                         RType -> writeRTypeBinary instruction
---                                         JType -> writeJTypeBinary instruction
---                                         IType -> writeITypeBinary instruction
+labelToBinary :: String -> String
+labelToBinary label = undefined
 
 -- Converts string from scanner into opcode enum
 toOpcode :: String -> Opcode

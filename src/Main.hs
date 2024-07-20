@@ -4,11 +4,11 @@ module Main where
 import Scanner
 import Parser
 
-printTokens :: Show a => [a] -> IO ()
-printTokens [] = return ()  
-printTokens (x:stream) = do
+printLines :: Show a => [a] -> IO ()
+printLines [] = return ()  
+printLines (x:stream) = do
     putStrLn (show x) 
-    printTokens stream
+    printLines stream
 
 main :: IO()
 main = do
@@ -16,23 +16,16 @@ main = do
     file <- readFile "test.asm" 
 
     -- flat array of all tokens
-    let tokenStream = map tokenize (lines file) 
-
+    let tokenStream = filter (not . null) (map tokenize (lines file) )
     let code = map generateCode tokenStream
 
+    --Parser will go here 
+    -- let bytecode = Parser program tokenStream
+
+    -- Later add if debug flag to print stream 
     putStrLn "Generated Code"
-    printTokens code
-
-    -- Parser starting at first production
-    -- let parser = parseMIPS tokenStream
-
-    -- let bytecode = case parser of
-    --                 Right err -> print err
-    --                 Left program -> print program
-    -- -- in 
-    --     print bytecode
-
-    -- Later add if debug flag to print stream
+    printLines code
+    
     putStrLn "Token Stream"
-    printTokens tokenStream
+    printLines tokenStream
 

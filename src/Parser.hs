@@ -2,7 +2,7 @@ module Parser where
 
 import Scanner
 import Instructions 
--- import Control.Monad.State
+import Control.Monad.State(State)
 
 --   MIPS Grammar
 --   program ::= [line]
@@ -17,6 +17,8 @@ import Instructions
 -- State, Token Buffer, Current Nonterminal, Current Memory Address
 -- type Parser a = State [Token] a Int
 
+type Parser a = [Token] -> (a, [Token]) 
+
 --Temporary function until parser is made
 generateCode :: [Token] -> String
 generateCode [] = ""
@@ -24,7 +26,7 @@ generateCode (tok:buff) = case tok of
                             LabelTok a -> a ++ generateCode buff
                             OpcodeTok a -> opcodeToBinary a ++ generateCode buff
                             NumberTok a -> a ++ generateCode buff
-                            RegisterTok a -> show a ++ generateCode buff
+                            RegisterTok a -> registerToBinary a ++ generateCode buff
                             DirectiveTok a -> a ++ generateCode buff
                            
 --  -- Placeholder memory address
