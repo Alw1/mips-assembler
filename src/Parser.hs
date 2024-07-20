@@ -13,23 +13,74 @@ import Text.Printf (printf)
 --   JTypeInstruction ::= opcode address
 --   directive ::= directiveType [operand]
 
--- Uses the state monad to update token buffer
--- State, Token Buffer, Current Nonterminal, Current Memory Address
--- type Parser a = State [Token] a Int
+peekToken :: [Token] -> Maybe Token
+peekToken x =  if null x then 
+                 Nothing
+               else
+                  Just(head x)
+            
+parseMIPS :: [Token] -> String
+parseMIPS [] = ""
+parseMIPS (x:xs) = case x of 
+                    MemoryTok _ -> generateCode x ++ parseMIPS xs
+                    OpcodeTok _ -> parseInstruction (x:xs)
+                    _           -> error ("[Parse Error] Unexpected Token: " ++ show x)
 
-type Parser a = [Token] -> (a, [Token]) 
+--   instruction ::= RTypeInstruction | ITypeInstruction | JTypeInstruction
+parseInstruction :: [Token] -> String
+parseInstruction [] = error "[parseInstruction Error] Expected arguments after opcode: "
+parseInstruction stream@(x:xs) 
+  | ADD <= op && op <= MTLO  = parseRTypeInstruction stream
+  | ADDI <= op && op <= BLEZ = parseITypeInstruction stream
+  | JALR <= op && op <= JR   = parseJTypeInstruction stream
+  | otherwise                = error ("Shit went wrong here" ++ show x)
+  where
+    op = case x of 
+          OpcodeTok a -> a
+          _ -> error "Not an opcode"
+                      
+-- Note for me, in order to get around state monad shit,
+-- maybe keep an incrementing count in each
+-- nonterminal to see if it exceeds it's expected argument count?
 
---Temporary function until parser is made
--- generateCode :: [Token] -> String
--- generateCode [] = ""
--- generateCode (tok:buff) = case tok of 
---                             LabelTok a -> a ++ generateCode buff
---                             OpcodeTok a -> opcodeToBinary a ++ generateCode buff
---                             NumberTok a -> printf "%b" a ++ generateCode buff
---                             RegisterTok a -> registerToBinary a ++ generateCode buff
---                             DirectiveTok a -> a ++ generateCode buff
---                             MemoryTok a -> a ++ generateCode buff
+--   RTypeInstruction ::= opcode rs rt rd shamt funct
+parseRTypeInstruction :: [Token] -> String
+parseRTypeInstruction [] = error "[parseRTypeInstruction Error] Expected arguments after opcode: "
+parseRTypeInstruction (x:xs)
+  | ADD <= op && op <= SUBU  = ""    -- Arithmetic and Logical instructions
+  | MULT <= op && op <= DIVU = ""    -- Multiplication / Division instructions
+  | SLL <= op && op <= SRA   = ""
+  | otherwise                = error "Shit went wrong here too"
+  where
+    op = case x of 
+            OpcodeTok a -> a
+            _ -> error "Not an opcode"
+                   
+--   ITypeInstruction ::= opcode rs rt immediate
+parseITypeInstruction :: [Token] -> String
+parseITypeInstruction [] = error "[parseITypeInstruction Error] Expected arguments after opcode: "
+parseITypeInstruction (x:xs) = undefined
 
+
+--   JTypeInstruction ::= opcode address
+parseJTypeInstruction :: [Token] -> String
+parseJTypeInstruction [] = error "[parseJTypeInstruction Error] Expected arguments after opcode: "
+parseJTypeInstruction (x:xs) = let
+                                  opcode = x
+                                  address = case xs of
+                                      (NumberTok a : _) -> generateCode $ NumberTok a
+                                      _ -> error "[parseJTypeInstruction Error] Jump instructions require an address."
+                                in
+                                  generateCode opcode ++ address ++ parseMIPS (tail xs)
+
+
+--   directive ::= directiveType [operand]
+parseDirective :: [Token] -> String
+parseDirective [] = error "[parseDirective] Expected arguments after directive: "
+parseDirective (x:xs) = undefined
+
+
+-- Turn each token into binary if there isn't any parser errors 
 generateCode :: Token -> String
 generateCode tok = case tok of 
                         LabelTok a -> a 
@@ -38,28 +89,3 @@ generateCode tok = case tok of
                         RegisterTok a -> registerToBinary a 
                         DirectiveTok a -> a 
                         MemoryTok a -> a 
-
-
-parseMIPS :: [Token] -> String
-parseMIPS [] = ""
-parseMIPS buff@(x:xs) = case x of 
-                    MemoryTok _ -> generateCode x ++ parseMIPS xs
-                    OpcodeTok _ -> parseInstruction buff
-                              _ -> error ("[Parse Error] Unexpected Token: " ++ x)
-
-parseInstruction :: [Token] -> String
-parseInstruction [] = error "[Parse Error] Expected arguments after opcode: "
-parseInstruction (x:xs) = case x of
-                                RegisterTok _ -> generateCode x ++ parseMIPS xs
-                                NumberTok _ -> parseInstruction x
-                                          _ -> error ("[Parse Error] Unexpected Token: " ++ x)
-
-parseRTypeInstruction :: [Token] -> String
-parseRTypeInstruction [] = error "[Parse Error] Expected arguments after opcode: "
-
-parseITypeInstruction :: [Token] -> String
-parseITypeInstruction [] = error "[Parse Error] Expected arguments after opcode: "
-
-parseJTypeInstruction :: [Token] -> String
-parseJTypeInstruction [] = error "[Parse Error] Expected arguments after opcode: "
-parseJTypeInstruction (x:xs) = 

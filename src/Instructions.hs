@@ -24,50 +24,46 @@ data Instruction = RType { op :: Opcode, rs :: Int, rt :: Int, rd :: Int, shamt 
                  | JType { op :: Opcode, address :: Int }
                  deriving(Show)
 
--- enum for all opcodes
-data Opcode = ADD   -- arithmetic instructions
-            | ADDI 
-            | ADDIU 
-            | ADDU
-            | DIV
-            | DIVU
-            | MULT
+-- enum for all opcodes (NOTE: ORder here matters, don't change)
+data Opcode = ADD  -- R Type Instructions
+            | ADDU 
+            | SUB  
+            | SUBU 
+            | MULT 
             | MULTU
-            | SUB
-            | SUBU
-            | NOR  -- logical instructions
-            | OR
-            | ORI
-            | AND
-            | ANDI
-            | XOR
-            | XORI
-            | SLL  -- shift instructions
-            | SLLV
-            | SRA
-            | SRAV
-            | SRL
-            | SLT
-            | SLTU
-            | SLTI
+            | DIV  
+            | DIVU 
+            | AND  
+            | OR   
+            | XOR  
+            | NOR  
+            | SLL  
+            | SRL  
+            | SRA  
+            | MFHI 
+            | MFLO 
+            | MTHI 
+            | MTLO 
+            | ADDI  -- I Type Instructions
+            | ADDIU
+            | SLTI 
             | SLTIU
-            | LB  -- load instructions
-            | LBU 
-            | LH
-            | LI
-            | LHU  
-            | LW
-            | BEQ   -- branch instructions
-            | BGTZ
-            | BLEZ
-            -- | BLTZAL
-            -- | BLTZ
-            | BNE
-            | J     -- jump instructions
-            | JAL
-            | JALR
+            | ANDI 
+            | ORI  
+            | XORI 
+            | LW   
+            | SW   
+            | BEQ  
+            | BNE  
+            | BLTZ 
+            | BGTZ 
+            | BLEZ 
+            | JALR  -- J Type Instructions
+            | JUMP 
+            | JAL  
+            | J
             | JR
-            deriving(Enum, Show, Read, Eq)
+            deriving(Enum, Show, Read, Eq, Ord)
 
 -- Registers Enum
 data Register = ZERO   
@@ -120,22 +116,22 @@ opcodeToBinary op = case op of
                     OR -> "100101"
                     ORI -> "001101"
                     SLL -> "000000"
-                    SLLV -> "000100"
+                  --  SLLV -> "000100"
                     SRA -> "000011"
-                    SRAV -> "000111"
+                   -- SRAV -> "000111"
                     SRL -> "000010"
                     SUB -> "100010"
                     SUBU -> "100011"
                     XOR -> "100110"
                     XORI -> "001110"
-                    LB -> "100000"
-                    LBU -> "100100"
-                    LH -> "100001"
-                    LI -> "999999" -- TEMP, REMOVE LATER
-                    LHU -> "100101"
+                  --  LB -> "100000"
+                   -- LBU -> "100100"
+                   -- LH -> "100001"
+                   -- LI -> "999999" -- TEMP, REMOVE LATER
+                   -- LHU -> "100101"
                     LW -> "100011"
-                    SLT -> "101010"
-                    SLTU -> "101001"
+                   -- SLT -> "101010"
+                   -- SLTU -> "101001"
                     SLTI -> "001010"
                     SLTIU -> "001001"
                     BEQ -> "000100"
@@ -146,6 +142,7 @@ opcodeToBinary op = case op of
                     JAL -> "000011"
                     JALR -> "001001"
                     JR -> "001000"
+                    _ -> "ERROR: OPCODE NOT IMPLEMENTED"
 
 registerToBinary :: Register -> String
 registerToBinary op = case op of 
@@ -199,5 +196,4 @@ toRegister register = read $ map toUpper register
 
 -- Note: add custom error for when string to enum conversion fails
 -- to find an existing register or opcode 
-
 

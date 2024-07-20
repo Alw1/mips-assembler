@@ -23,14 +23,16 @@ main = do
     let temp = assignMemory (concat tokenStream) startAddress
 
 
-    let code = generateCode temp
+    --let code = generateCode temp
+
+    let parser = parseMIPS temp
 
     -- --Parser will go here 
     -- -- let bytecode = Parser program tokenStream
 
     -- -- Later add if debug flag to print stream 
     putStrLn "Generated Code"
-    print code
+    print parser
     
     putStrLn "\n\nToken Stream"
     print temp
@@ -38,6 +40,6 @@ main = do
     putStrLn "\n\nSource File"
     putStrLn file
 
-    writeFile "output.bin" code  
+    writeFile "output.bin" parser  
 
 

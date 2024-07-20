@@ -12,6 +12,8 @@ data Token =  LabelTok String
             | MemoryTok String -- Not used in scanning, used in assigning address to directives and labels 
             deriving(Show, Eq)
 
+
+    
 -- Creates a list of all tokens in a given line
 tokenize :: String -> [Token]
 tokenize [] = []
@@ -19,7 +21,7 @@ tokenize line@(x:xs)
     | isDigit x = tokenizeNumber line
     | isAlpha x = tokenizeLabel line
     | isSpace x || x == ',' = tokenize xs -- ignores whitespace & commas
-    | x == '#' = tokenize []              -- ignore line if its a comment
+    | x == '#' || x == ';' = tokenize []              -- ignore line if its a comment
     | x == '$' = tokenizeRegister xs
     | x == '.' = tokenizeDirective xs
     | otherwise = error $ "[Scanner Error] Unexpected input in line" ++ line
@@ -32,7 +34,7 @@ tokenizeRegister line = let (register, line_tail) = span isAlphaNum line
 tokenizeNumber :: String -> [Token]
 tokenizeNumber [] = []
 tokenizeNumber line = let (num, line_tail) = span isDigit line
-                      in NumberTok  (read num) : tokenize line_tail
+                      in NumberTok (read num) : tokenize line_tail
 
 tokenizeDirective :: String -> [Token]
 tokenizeDirective [] = []
