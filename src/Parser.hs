@@ -22,7 +22,8 @@ peekToken x =  if null x then
 parseMIPS :: [Token] -> String
 parseMIPS [] = ""
 parseMIPS (x:xs) = case x of 
-                    MemoryTok _ -> generateCode x ++ parseMIPS xs
+                    LabelTok _ -> generateCode x ++ parseMIPS xs
+                    DirectiveTok _ -> generateCode x ++ parseMIPS xs
                     OpcodeTok _ -> parseInstruction (x:xs)
                     _           -> error ("[Parse Error] Unexpected Token: " ++ show x)
 
@@ -39,10 +40,6 @@ parseInstruction stream@(x:xs)
           OpcodeTok a -> a
           _ -> error "Not an opcode"
                       
--- Note for me, in order to get around state monad shit,
--- maybe keep an incrementing count in each
--- nonterminal to see if it exceeds it's expected argument count?
-
 --   RTypeInstruction ::= opcode rs rt rd shamt funct
 parseRTypeInstruction :: [Token] -> String
 parseRTypeInstruction [] = error "[parseRTypeInstruction Error] Expected arguments after opcode: "
@@ -55,31 +52,44 @@ parseRTypeInstruction (x:xs)
     op = case x of 
             OpcodeTok a -> a
             _ -> error "Not an opcode"
-    generateInstruction args = concatMap generateCode (x : take args xs)
+    generateInstruction args =
+      if length xs < args then
+        error $ "[parseRTypeInstruction Error] Instruction " ++ show op ++ " Expects " ++ show args ++ " arguments"
+      else 
+        concatMap generateCode (x : take args xs) ++ "\n"
                  
 --   ITypeInstruction ::= opcode rs rt immediate
 parseITypeInstruction :: [Token] -> String
 parseITypeInstruction [] = error "[parseITypeInstruction Error] Expected arguments after opcode: "
-parseITypeInstruction (x:xs) = "parseITypeInstruction Not Implemented" ++ parseMIPS (x:xs)
-
-
+parseITypeInstruction (x:xs)
+  | ADDI <= op && op <= XORI  = generateInstruction 3 ++ parseMIPS (drop 3 xs)   -- Immediate Arithmetic and Logical Instructions ($d, $s, n )
+  | otherwise                = error "ITYPE NOT FULLY IMPLEMENTED YET"
+  where
+    op = case x of 
+            OpcodeTok a -> a
+            _ -> error "Not an opcode"
+    generateInstruction args =
+      if length xs < args then
+        error $ "[parseITypeInstruction Error] Instruction " ++ show op ++ " Expects " ++ show args ++ " arguments"
+      else 
+        concatMap generateCode (x : take args xs) ++ "\n"
+                 
 --   JTypeInstruction ::= opcode address
 parseJTypeInstruction :: [Token] -> String
 parseJTypeInstruction [] = error "[parseJTypeInstruction Error] Expected arguments after opcode: "
-parseJTypeInstruction (x:xs) = let
-                                  opcode = x
-                                  address = case xs of
-                                      (NumberTok a : _) -> generateCode $ NumberTok a
-                                      (MemoryTok a : _) -> generateCode $ MemoryTok a
-                                      _ -> error "[parseJTypeInstruction Error] Jump instructions require an address." ++ show x
-                                in
-                                  generateCode opcode ++ address ++ parseMIPS (tail xs)
-
+parseJTypeInstruction (x:y:xs) = let
+                                    opcode = x
+                                    address = case y of
+                                        (NumberTok a) -> generateCode $ NumberTok a 
+                                        (MemoryTok a ) -> generateCode $ MemoryTok a
+                                        _ -> error $ "[parseJTypeInstruction Error] Jump instructions require an address." ++ show y
+                                  in
+                                    generateCode opcode ++ address ++ parseMIPS xs
 
 --   directive ::= directiveType [operand]
 parseDirective :: [Token] -> String
 parseDirective [] = error "[parseDirective] Expected arguments after directive: "
-parseDirective (x:xs) = undefined
+parseDirective (x:xs) = generateCode x ++ parseMIPS xs
 
 
 -- Turn each token into binary if there isn't any parser errors 

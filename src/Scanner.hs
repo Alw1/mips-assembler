@@ -3,6 +3,7 @@ module Scanner where
 import Data.Char (isDigit, isAlpha, isAlphaNum, isSpace)
 import Instructions 
 import Text.Printf (printf)
+import Copilot.Core (Expr(Label))
 
 data Token =  LabelTok String
             | DirectiveTok String --Maybe(String) -- directive argument
@@ -11,7 +12,6 @@ data Token =  LabelTok String
             | NumberTok Int
             | MemoryTok String -- Not used in scanning, used in assigning address to directives and labels 
             deriving(Show, Eq)
-
 
     
 -- Creates a list of all tokens in a given line
@@ -46,10 +46,10 @@ tokenizeLabel :: String -> [Token]
 tokenizeLabel [] = []
 tokenizeLabel str =  let (label, line_tail) = span isAlphaNum str
                      in 
-                     if (not . null) line_tail && head line_tail == ':' then 
-                        LabelTok label : tokenize (tail line_tail)
-                     else 
-                        tokenizeOpcode str 
+                        if (not . null) line_tail && head line_tail == ':' then 
+                           LabelTok label : tokenize (tail line_tail)
+                        else 
+                           tokenizeOpcode str 
 
 tokenizeOpcode :: String -> [Token]
 tokenizeOpcode [] = []
@@ -59,17 +59,25 @@ tokenizeOpcode str = let (op, line_tail) = span isAlpha str
 
 -- Transform labels and directives in memory addresses
 -- NOTE: label memory addresses need to match all occurences of it, fix later
-assignMemory :: [Token] -> Int -> [Token]
-assignMemory [] _ = []
-assignMemory (x:xs) addr = case x of
-                      LabelTok _ -> MemoryTok (printf "%b" addr) : assignMemory xs (addr + size)
-                      DirectiveTok _ -> MemoryTok (printf "%b" addr) : assignMemory xs (addr + size)
-                      _ -> x : assignMemory xs addr
-                      where
-                        size = 0x10 --Size of memory to be allocated
-            
-             
+-- assignMemory ::  Int -> [Token] -> [Token]
+-- assignMemory _ [] = []
+-- assignMemory addr (x:xs) = case x of
+--                       LabelTok _ -> MemoryTok (printf "%b" addr) : assignMemory (addr + size) xs
+--                       DirectiveTok _ -> MemoryTok (printf "%b" addr) : assignMemory (addr + size) xs
+--                       _ -> x : assignMemory addr xs 
+--                       where
+--                         size = 0x99 --Size of memory to be allocated
 
+assignMemory ::  Int -> [Token] -> [Token]
+assignMemory _ [] = []
+assignMemory addr (x:xs) = case x of
+                      LabelTok _ -> LabelTok (printf "%b" addr) : assignMemory (addr + size) xs
+                      DirectiveTok _ -> DirectiveTok (printf "%b" addr) : assignMemory (addr + size) xs
+                      _ -> x : assignMemory addr xs 
+                      where
+                        size = 0x99 --Size of memory to be allocated
+                               
+             
 -- Add error checking in directive and register tokenizations
 -- if the remaining length is 1 and the current char is . or $
 -- if length xs == 1 then error undefinedelse do shit
