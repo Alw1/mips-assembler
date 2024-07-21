@@ -33,12 +33,12 @@ main = do
     putStrLn "\n\nToken Stream"
     printLines temp
 
-    putStrLn "Generated Code"
+    putStrLn "\n\nGenerated Code"
     printLines parser
 
     putStrLn "\n\nSource File"
     putStrLn file
-
+  
     writeFile (outputFile args) (concat parser)
 
 

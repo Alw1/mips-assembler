@@ -2,14 +2,14 @@ module CLI where
     
 import Options.Applicative
 import Data.Semigroup ((<>))
+import System.Console.ArgParser (boolFlag)
 
--- Define the data type for command-line options
 data Options = Options
   { sourceFile :: String
   , outputFile :: String
+  , debugFlag  :: Bool
   } deriving Show
 
--- Define the parser for command-line options
 optionsParser :: Parser Options
 optionsParser = Options
   <$> argument str
@@ -21,10 +21,12 @@ optionsParser = Options
      <> help "Name of output file"
      <> showDefault
      <> value "output.txt" )
+  <*> switch
+      ( long "debug"
+     <> help "debug flag")
 
--- Define the parser info with a description of your program
 optsParserInfo :: ParserInfo Options
 optsParserInfo = info (optionsParser <**> helper)
   ( fullDesc
- <> progDesc "MIPS 32 Assembler"
- <> header "MIPS 32 assembler written in Haskell" )
+ <> header "MIPS 32 Assembler written in Haskell" )
+
