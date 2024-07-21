@@ -47,19 +47,20 @@ parseInstruction stream@(x:xs)
 parseRTypeInstruction :: [Token] -> String
 parseRTypeInstruction [] = error "[parseRTypeInstruction Error] Expected arguments after opcode: "
 parseRTypeInstruction (x:xs)
-  | ADD <= op && op <= SUBU  = ""    -- Arithmetic and Logical instructions
-  | MULT <= op && op <= DIVU = ""    -- Multiplication / Division instructions
-  | SLL <= op && op <= SRA   = ""
+  | ADD <= op && op <= SUBU  = generateInstruction 3 ++ parseMIPS (drop 3 xs)   -- Arithmetic and Logical Instructions (f $d, $s, $t )
+  | MULT <= op && op <= DIVU = generateInstruction 2 ++ parseMIPS (drop 2 xs)   -- Multiplication / Division Instructions
+  | SLL <= op && op <= SRA   = generateInstruction 3 ++ parseMIPS (drop 3 xs)    -- Shift Instructions
   | otherwise                = error "Shit went wrong here too"
   where
     op = case x of 
             OpcodeTok a -> a
             _ -> error "Not an opcode"
-                   
+    generateInstruction args = concatMap generateCode (x : take args xs)
+                 
 --   ITypeInstruction ::= opcode rs rt immediate
 parseITypeInstruction :: [Token] -> String
 parseITypeInstruction [] = error "[parseITypeInstruction Error] Expected arguments after opcode: "
-parseITypeInstruction (x:xs) = undefined
+parseITypeInstruction (x:xs) = "parseITypeInstruction Not Implemented" ++ parseMIPS (x:xs)
 
 
 --   JTypeInstruction ::= opcode address
@@ -69,7 +70,8 @@ parseJTypeInstruction (x:xs) = let
                                   opcode = x
                                   address = case xs of
                                       (NumberTok a : _) -> generateCode $ NumberTok a
-                                      _ -> error "[parseJTypeInstruction Error] Jump instructions require an address."
+                                      (MemoryTok a : _) -> generateCode $ MemoryTok a
+                                      _ -> error "[parseJTypeInstruction Error] Jump instructions require an address." ++ show x
                                 in
                                   generateCode opcode ++ address ++ parseMIPS (tail xs)
 

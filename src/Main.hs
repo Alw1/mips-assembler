@@ -15,13 +15,13 @@ main = do
  
     file <- readFile "test.asm" 
 
+    print file
     -- Starting address of memory
     let startAddress = 0x000
 
     let tokenStream = filter (not . null) (map tokenize (lines file))
 
     let temp = assignMemory (concat tokenStream) startAddress
-
 
     --let code = generateCode temp
 
@@ -31,15 +31,16 @@ main = do
     -- -- let bytecode = Parser program tokenStream
 
     -- -- Later add if debug flag to print stream 
+
+    putStrLn "\n\nToken Stream"
+    printLines (tokenStream)
+
     putStrLn "Generated Code"
     print parser
-    
-    putStrLn "\n\nToken Stream"
-    print temp
 
     putStrLn "\n\nSource File"
     putStrLn file
 
-    writeFile "output.bin" parser  
+    -- writeFile "output.bin" parser  
 
 

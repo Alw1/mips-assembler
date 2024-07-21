@@ -24,7 +24,7 @@ data Instruction = RType { op :: Opcode, rs :: Int, rt :: Int, rd :: Int, shamt 
                  | JType { op :: Opcode, address :: Int }
                  deriving(Show)
 
--- enum for all opcodes (NOTE: ORder here matters, don't change)
+-- enum for all opcodes (NOTE: Order here matters, don't change)
 data Opcode = ADD  -- R Type Instructions
             | ADDU 
             | SUB  

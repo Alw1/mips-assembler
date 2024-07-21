@@ -18,10 +18,11 @@ data Token =  LabelTok String
 tokenize :: String -> [Token]
 tokenize [] = []
 tokenize line@(x:xs)
+    | null xs = []  --probably not needed
     | isDigit x = tokenizeNumber line
     | isAlpha x = tokenizeLabel line
     | isSpace x || x == ',' = tokenize xs -- ignores whitespace & commas
-    | x == '#' || x == ';' = tokenize []              -- ignore line if its a comment
+    | x == '#' = tokenize []              -- ignore line if its a comment
     | x == '$' = tokenizeRegister xs
     | x == '.' = tokenizeDirective xs
     | otherwise = error $ "[Scanner Error] Unexpected input in line" ++ line
@@ -57,16 +58,18 @@ tokenizeOpcode str = let (op, line_tail) = span isAlpha str
 
 
 -- Transform labels and directives in memory addresses
+-- NOTE: label memory addresses need to match all occurences of it, fix later
 assignMemory :: [Token] -> Int -> [Token]
 assignMemory [] _ = []
 assignMemory (x:xs) addr = case x of
-                      LabelTok a -> MemoryTok (printf "%b" addr) : assignMemory xs (addr + size)
-                      DirectiveTok a -> MemoryTok (printf "%b" addr) : assignMemory xs (addr + size)
+                      LabelTok _ -> MemoryTok (printf "%b" addr) : assignMemory xs (addr + size)
+                      DirectiveTok _ -> MemoryTok (printf "%b" addr) : assignMemory xs (addr + size)
                       _ -> x : assignMemory xs addr
                       where
                         size = 0x10 --Size of memory to be allocated
+            
              
 
 -- Add error checking in directive and register tokenizations
 -- if the remaining length is 1 and the current char is . or $
--- if length xs == 1 then error else do shit
+-- if length xs == 1 then error undefinedelse do shit
