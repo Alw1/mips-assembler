@@ -13,12 +13,6 @@ import Text.Printf (printf)
 --   JTypeInstruction ::= opcode address
 --   directive ::= directiveType [operand]
 
-peekToken :: [Token] -> Maybe Token
-peekToken x =  if null x then 
-                 Nothing
-               else
-                  Just(head x)
-            
 parseMIPS :: [Token] -> String
 parseMIPS [] = ""
 parseMIPS (x:xs) = case x of 

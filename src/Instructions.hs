@@ -44,7 +44,7 @@ data Opcode = ADD  -- R Type Instructions
             | MFHI 
             | MFLO 
             | MTHI 
-            | MTLO 
+            | MTLO  
             | ADDI  -- I Type Instructions
             | ADDIU
             | SLTI 
@@ -180,12 +180,6 @@ registerToBinary op = case op of
                     FP -> "000111"
                     RA -> "000010"
     
-
-numberToBinary :: String -> String
-numberToBinary num = undefined
-
-labelToBinary :: String -> String
-labelToBinary label = undefined
 
 -- Converts string from scanner into opcode enum
 toOpcode :: String -> Maybe Opcode

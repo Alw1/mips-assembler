@@ -1,8 +1,11 @@
 module Main where 
 
--- import System.Console.ArgParser
+
+import System.Exit
 import Scanner
 import Parser
+import CLI
+import Options.Applicative
 
 printLines :: Show a => [a] -> IO ()
 printLines [] = return ()  
@@ -13,7 +16,9 @@ printLines (x:stream) = do
 main :: IO()
 main = do
  
-    file <- readFile "test.asm" 
+    args <- execParser optsParserInfo
+
+    file <- readFile (sourceFile args)
 
     -- Starting address of memory
     let startAddress = 0x010
@@ -34,6 +39,6 @@ main = do
     putStrLn "\n\nSource File"
     putStrLn file
 
-    writeFile "output.bin" (concat parser)
+    writeFile (outputFile args) (concat parser)
 
 

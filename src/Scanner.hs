@@ -3,7 +3,6 @@ module Scanner where
 import Data.Char (isDigit, isAlpha, isAlphaNum, isSpace)
 import Instructions 
 import Text.Printf (printf)
-import Copilot.Core (Expr(Label))
 
 data Token =  LabelTok String
             | DirectiveTok String --Maybe(String) -- directive argument
