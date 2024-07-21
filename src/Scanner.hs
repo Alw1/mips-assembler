@@ -46,7 +46,7 @@ tokenizeLabel :: String -> [Token]
 tokenizeLabel [] = []
 tokenizeLabel str =  let (label, line_tail) = span isAlphaNum str
                      in 
-                        if (not . null) line_tail && head line_tail == ':' then 
+                        if (not . null) line_tail && (not.isOpcode) label then 
                            LabelTok label : tokenize (tail line_tail)
                         else 
                            tokenizeOpcode str 
@@ -54,8 +54,11 @@ tokenizeLabel str =  let (label, line_tail) = span isAlphaNum str
 tokenizeOpcode :: String -> [Token]
 tokenizeOpcode [] = []
 tokenizeOpcode str = let (op, line_tail) = span isAlpha str
-                     in OpcodeTok (toOpcode op) : tokenize line_tail
-
+                     in 
+                        case toOpcode op of
+                           Just a ->  OpcodeTok a : tokenize line_tail
+                           Nothing -> error $ "[Scanner Error] " ++ op ++ " is not an opcode"
+                       
 
 -- Transform labels and directives in memory addresses
 -- NOTE: label memory addresses need to match all occurences of it, fix later

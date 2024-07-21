@@ -1,6 +1,7 @@
 -- module Instructions( Opcode(..), Instruction(..), Register(..)) where
 module Instructions where 
 import Data.Char (toUpper)
+import Text.Read (readMaybe)
 
 --    Terms used in MIPS    --
 ------------------------------
@@ -187,8 +188,15 @@ labelToBinary :: String -> String
 labelToBinary label = undefined
 
 -- Converts string from scanner into opcode enum
-toOpcode :: String -> Opcode
-toOpcode op = read $ map toUpper op
+toOpcode :: String -> Maybe Opcode
+toOpcode op = readMaybe (map toUpper op) 
+                 
+
+-- Checks if opcode exists 
+isOpcode :: String -> Bool
+isOpcode op = case toOpcode op of
+                 Just a -> True
+                 Nothing -> False
 
 -- Converts string from scanner into register enum
 toRegister :: String -> Register

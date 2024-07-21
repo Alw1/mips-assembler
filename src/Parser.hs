@@ -80,8 +80,7 @@ parseJTypeInstruction [] = error "[parseJTypeInstruction Error] Expected argumen
 parseJTypeInstruction (x:y:xs) = let
                                     opcode = x
                                     address = case y of
-                                        (NumberTok a) -> generateCode $ NumberTok a 
-                                        (MemoryTok a ) -> generateCode $ MemoryTok a
+                                        (LabelTok a) -> generateCode $ LabelTok a
                                         _ -> error $ "[parseJTypeInstruction Error] Jump instructions require an address." ++ show y
                                   in
                                     generateCode opcode ++ address ++ parseMIPS xs
