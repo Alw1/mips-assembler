@@ -1,11 +1,10 @@
 module Main where 
-
-
-import System.Exit
-import Scanner
-import Parser
-import CLI
-import Options.Applicative
+    
+import System.Exit ()
+import Scanner ( tokenize, assignMemory )
+import Parser ( parseMIPS )
+import CLI ( Options(outputFile, sourceFile), optsParserInfo )
+import Options.Applicative ( execParser )
 
 printLines :: Show a => [a] -> IO ()
 printLines [] = return ()  
@@ -29,6 +28,7 @@ main = do
 
     -- Parse & generate code
     let parser = map parseMIPS temp
+
 
     putStrLn "\n\nToken Stream"
     printLines temp

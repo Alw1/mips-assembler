@@ -71,11 +71,11 @@ parseITypeInstruction (x:xs)
 --   JTypeInstruction ::= opcode address
 parseJTypeInstruction :: [Token] -> String
 parseJTypeInstruction [] = error "[parseJTypeInstruction Error] Expected arguments after opcode: "
-parseJTypeInstruction (x:y:xs) = let
+parseJTypeInstruction (x:xs) = let
                                     opcode = x
-                                    address = case y of
+                                    address = case head xs of
                                         (LabelTok a) -> generateCode $ LabelTok a
-                                        _ -> error $ "[parseJTypeInstruction Error] Jump instructions require an address." ++ show y
+                                        _ -> error $ "[parseJTypeInstruction Error] Jump instructions require an address." ++ show (head xs)
                                   in
                                     generateCode opcode ++ address ++ parseMIPS xs
 
@@ -93,4 +93,4 @@ generateCode tok = case tok of
                         NumberTok a -> printf "%b" a 
                         RegisterTok a -> registerToBinary a 
                         DirectiveTok a -> a 
-                        MemoryTok a -> a 
+                

@@ -9,7 +9,6 @@ data Token =  LabelTok String
             | OpcodeTok Opcode
             | RegisterTok Register
             | NumberTok Int
-            | MemoryTok String -- Not used in scanning, used in assigning address to directives and labels 
             deriving(Show, Eq)
 
     
@@ -45,7 +44,7 @@ tokenizeLabel :: String -> [Token]
 tokenizeLabel [] = []
 tokenizeLabel str =  let (label, line_tail) = span isAlphaNum str
                      in 
-                        if (not . null) line_tail && (not.isOpcode) label then 
+                        if (not.null) line_tail && (not.isOpcode) label then 
                            LabelTok label : tokenize (tail line_tail)
                         else 
                            tokenizeOpcode str 
@@ -60,24 +59,14 @@ tokenizeOpcode str = let (op, line_tail) = span isAlpha str
                        
 
 -- Transform labels and directives in memory addresses
--- NOTE: label memory addresses need to match all occurences of it, fix later
--- assignMemory ::  Int -> [Token] -> [Token]
--- assignMemory _ [] = []
--- assignMemory addr (x:xs) = case x of
---                       LabelTok _ -> MemoryTok (printf "%b" addr) : assignMemory (addr + size) xs
---                       DirectiveTok _ -> MemoryTok (printf "%b" addr) : assignMemory (addr + size) xs
---                       _ -> x : assignMemory addr xs 
---                       where
---                         size = 0x99 --Size of memory to be allocated
-
 assignMemory ::  Int -> [Token] -> [Token]
 assignMemory _ [] = []
 assignMemory addr (x:xs) = case x of
-                      LabelTok _ -> LabelTok (printf "%b" addr) : assignMemory (addr + size) xs
-                      DirectiveTok _ -> DirectiveTok (printf "%b" addr) : assignMemory (addr + size) xs
+                      LabelTok _ -> LabelTok (printf "%b" addr) : assignMemory size xs
+                      DirectiveTok _ -> DirectiveTok (printf "%b" addr) : assignMemory size xs
                       _ -> x : assignMemory addr xs 
                       where
-                        size = 0x99 --Size of memory to be allocated
+                        size = addr + 0x99 --Size of memory to be allocated
                                
              
 -- Add error checking in directive and register tokenizations
