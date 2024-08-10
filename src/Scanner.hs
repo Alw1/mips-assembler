@@ -11,16 +11,14 @@ data Token =  LabelTok String
             | NumberTok Int
             deriving(Show, Eq)
 
-    
 -- Creates a list of all tokens in a given line
 tokenize :: String -> [Token]
 tokenize [] = []
 tokenize line@(x:xs)
-    | null xs = []  --probably not needed
     | isDigit x = tokenizeNumber line
     | isAlpha x = tokenizeLabel line
     | isSpace x || x == ',' = tokenize xs -- ignores whitespace & commas
-    | x == '#' = tokenize []              -- ignore line if its a comment
+    | x == '#' || x == ';' = tokenize []              -- ignore line if its a comment
     | x == '$' = tokenizeRegister xs
     | x == '.' = tokenizeDirective xs
     | otherwise = error $ "[Scanner Error] Unexpected input in line" ++ line
@@ -38,7 +36,9 @@ tokenizeNumber line = let (num, line_tail) = span isDigit line
 tokenizeDirective :: String -> [Token]
 tokenizeDirective [] = []
 tokenizeDirective str = let (dir, line_tail) = span isAlpha str
-                        in DirectiveTok dir : tokenize line_tail
+                        in 
+                           if isDirective dir then DirectiveTok dir : tokenize line_tail
+                           else error $ "[Scanner Error] Invalid Directive: " ++ dir 
       
 tokenizeLabel :: String -> [Token]
 tokenizeLabel [] = []
@@ -58,17 +58,19 @@ tokenizeOpcode str = let (op, line_tail) = span isAlpha str
                            Nothing -> error $ "[Scanner Error] " ++ op ++ " is not an opcode"
                        
 
--- Transform labels and directives in memory addresses
-assignMemory ::  Int -> [Token] -> [Token]
+-- Transform labels and directives into memory addresses             
+assignMemory :: Int -> [[Token]] -> [[Token]]
 assignMemory _ [] = []
-assignMemory addr (x:xs) = case x of
-                      LabelTok _ -> LabelTok (printf "%b" addr) : assignMemory size xs
-                      DirectiveTok _ -> DirectiveTok (printf "%b" addr) : assignMemory size xs
-                      _ -> x : assignMemory addr xs 
-                      where
-                        size = addr + 0x99 --Size of memory to be allocated
-                               
-             
+assignMemory address (x:xs) = assignMemory' address x : assignMemory (address + size) xs
+  where
+    size = 0x08 -- Size of memory address
+    assignMemory' :: Int -> [Token] -> [Token]
+    assignMemory' _ [] = []
+    assignMemory' addr (t:ts) = case t of
+        LabelTok _      -> LabelTok (printf "%08b" addr) : assignMemory' (addr + size) ts
+        DirectiveTok _  -> DirectiveTok (printf "%08b" addr) : assignMemory' (addr + size) ts
+        _               -> t : assignMemory' addr ts
+
 -- Add error checking in directive and register tokenizations
 -- if the remaining length is 1 and the current char is . or $
 -- if length xs == 1 then error undefinedelse do shit

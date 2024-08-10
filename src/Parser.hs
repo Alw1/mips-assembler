@@ -1,96 +1,63 @@
-module Parser where 
+-- module Parser where 
+
+module Parser where
 
 import Scanner
-import Instructions 
+import Instructions
 import Text.Printf (printf)
 
 --   MIPS Grammar
---   program ::= [line]
+--   program ::= line*
 --   line ::= [label] instruction | directive | label
---   instruction ::= RTypeInstruction | ITypeInstruction | JTypeInstruction
---   RTypeInstruction ::= opcode rs rt rd shamt funct
---   ITypeInstruction ::= opcode rs rt immediate
---   JTypeInstruction ::= opcode address
+--   instruction ::= opcode operands+
 --   directive ::= directiveType [operand]
 
+-- Parse a list of tokens into MIPS assembly code
 parseMIPS :: [Token] -> String
 parseMIPS [] = ""
 parseMIPS (x:xs) = case x of 
-                    LabelTok _ -> generateCode x ++ parseMIPS xs
-                    DirectiveTok _ -> generateCode x ++ parseMIPS xs
-                    OpcodeTok _ -> parseInstruction (x:xs)
-                    _           -> error ("[Parse Error] Unexpected Token: " ++ show x)
+    LabelTok _        -> generateCode x ++ parseMIPS xs
+    DirectiveTok _    -> generateCode x ++ parseMIPS xs
+    OpcodeTok _       -> parseInstruction (x:xs) 
+    _                 -> error ("[Parse Error] Unexpected Token: " ++ show x)
 
---   instruction ::= RTypeInstruction | ITypeInstruction | JTypeInstruction
 parseInstruction :: [Token] -> String
-parseInstruction [] = error "[parseInstruction Error] Expected arguments after opcode: "
-parseInstruction stream@(x:xs) 
-  | ADD <= op && op <= MTLO  = parseRTypeInstruction stream
-  | ADDI <= op && op <= BLEZ = parseITypeInstruction stream
-  | JALR <= op && op <= JR   = parseJTypeInstruction stream
-  | otherwise                = error ("Shit went wrong here" ++ show x)
+parseInstruction [] = error "[parseInstruction Error] Unexpected EOF"
+parseInstruction (x:xs) = 
+    let numOperands = checkInstruction op xs
+    in if length xs < numOperands then 
+           error $ "[parseInstruction Error] Expected " ++ show numOperands ++ " arguments, but got " ++ show (length xs)
+       else 
+           concatMap generateCode (take numOperands xs) ++ concatMap generateCode (take numOperands xs) ++ parseMIPS (drop numOperands xs)
   where
     op = case x of 
           OpcodeTok a -> a
-          _ -> error "Not an opcode"
-                      
---   RTypeInstruction ::= opcode rs rt rd shamt funct
-parseRTypeInstruction :: [Token] -> String
-parseRTypeInstruction [] = error "[parseRTypeInstruction Error] Expected arguments after opcode: "
-parseRTypeInstruction (x:xs)
-  | ADD <= op && op <= SUBU  = generateInstruction 3 ++ parseMIPS (drop 3 xs)   -- Arithmetic and Logical Instructions (f $d, $s, $t )
-  | MULT <= op && op <= DIVU = generateInstruction 2 ++ parseMIPS (drop 2 xs)   -- Multiplication / Division Instructions
-  | SLL <= op && op <= SRA   = generateInstruction 3 ++ parseMIPS (drop 3 xs)    -- Shift Instructions
-  | otherwise                = error "Shit went wrong here too"
+          _           -> error "Expected an opcode token"
+
+checkInstruction :: Opcode -> [Token] -> Int
+checkInstruction op tokens = case checkOperands tokens operand of
+    Just a  -> a
+    Nothing -> error $ "[parseInstruction Error] Instruction " ++ show op ++ " expects operands " ++ show operand ++ "\n\tActual operands: " ++ show tokens
   where
-    op = case x of 
-            OpcodeTok a -> a
-            _ -> error "Not an opcode"
-    generateInstruction args =
-      if length xs < args then
-        error $ "[parseRTypeInstruction Error] Instruction " ++ show op ++ " Expects " ++ show args ++ " arguments"
-      else 
-        concatMap generateCode (x : take args xs) ++ "\n"
-                 
---   ITypeInstruction ::= opcode rs rt immediate
-parseITypeInstruction :: [Token] -> String
-parseITypeInstruction [] = error "[parseITypeInstruction Error] Expected arguments after opcode: "
-parseITypeInstruction (x:xs)
-  | ADDI <= op && op <= XORI  = generateInstruction 3 ++ parseMIPS (drop 3 xs)   -- Immediate Arithmetic and Logical Instructions ($d, $s, n )
-  | otherwise                = error "ITYPE NOT FULLY IMPLEMENTED YET"
-  where
-    op = case x of 
-            OpcodeTok a -> a
-            _ -> error "Not an opcode"
-    generateInstruction args =
-      if length xs < args then
-        error $ "[parseITypeInstruction Error] Instruction " ++ show op ++ " Expects " ++ show args ++ " arguments"
-      else 
-        concatMap generateCode (x : take args xs) ++ "\n"
-                 
---   JTypeInstruction ::= opcode address
-parseJTypeInstruction :: [Token] -> String
-parseJTypeInstruction [] = error "[parseJTypeInstruction Error] Expected arguments after opcode: "
-parseJTypeInstruction (x:xs) = let
-                                    opcode = x
-                                    address = case head xs of
-                                        (LabelTok a) -> generateCode $ LabelTok a
-                                        _ -> error $ "[parseJTypeInstruction Error] Jump instructions require an address." ++ show (head xs)
-                                  in
-                                    generateCode opcode ++ address ++ parseMIPS xs
+    instruction = filter (\instr -> opcode instr == op) instructions 
+    operand = case instruction of
+                [] -> error $ "[parseInstruction Error] No such instruction: " ++ show op
+                (i:_) -> operands i 
 
---   directive ::= directiveType [operand]
-parseDirective :: [Token] -> String
-parseDirective [] = error "[parseDirective] Expected arguments after directive: "
-parseDirective (x:xs) = generateCode x ++ parseMIPS xs
+checkOperands :: [Token] -> [Operand] -> Maybe Int
+checkOperands [] [] = Just 0
+checkOperands (x:xs) (y:ys) = case (x, y) of
+    (RegisterTok _, REGISTER) -> fmap (+1) (checkOperands xs ys)
+    (NumberTok _, IMMEDIATE)  -> fmap (+1) (checkOperands xs ys)
+    (LabelTok _, ADDRESS)     -> fmap (+1) (checkOperands xs ys)
+    _ -> Nothing
+checkOperands _ _ = Nothing --might be unecessary
 
-
--- Turn each token into binary if there isn't any parser errors 
 generateCode :: Token -> String
 generateCode tok = case tok of 
-                        LabelTok a -> a 
-                        OpcodeTok a -> opcodeToBinary a 
-                        NumberTok a -> printf "%b" a 
-                        RegisterTok a -> registerToBinary a 
-                        DirectiveTok a -> a 
-                
+    LabelTok a       -> a 
+    OpcodeTok a      -> opcodeToBinary a 
+    NumberTok a      -> printf "%b" a 
+    RegisterTok a    -> registerToBinary a 
+    DirectiveTok a   -> a 
+

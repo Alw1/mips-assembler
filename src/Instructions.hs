@@ -19,11 +19,37 @@ import Text.Read (readMaybe)
 -- immediate ()
 ------------------------------
 
--- data type for an opcode and its operands
-data Instruction = RType { op :: Opcode, rs :: Int, rt :: Int, rd :: Int, shamt :: Int, funct :: Int }
-                 | IType { op :: Opcode, rs :: Int, rt :: Int, immediate :: Int }
-                 | JType { op :: Opcode, address :: Int }
-                 deriving(Show)
+data Instruction = Instruction{opcode :: Opcode, operands :: [Operand]}  
+
+data Operand = REGISTER 
+             | IMMEDIATE 
+             | ADDRESS 
+             deriving(Show, Eq)
+
+directives :: [String]
+directives = ["data", "asciiz", "space", "word", "text"]
+
+-- List of all implemented instructions and their operands
+instructions :: [Instruction]
+instructions = [
+    Instruction{opcode = ADD, operands = [REGISTER, REGISTER, REGISTER]},
+    Instruction{opcode = ADDU, operands = [REGISTER, REGISTER, REGISTER]},
+    Instruction{opcode = ADDI, operands = [REGISTER, REGISTER, IMMEDIATE]},
+    Instruction{opcode = ADDIU, operands = [REGISTER, REGISTER, IMMEDIATE]},
+    Instruction{opcode = SUB, operands = [REGISTER, REGISTER, REGISTER]},
+    Instruction{opcode = SUBU, operands = [REGISTER, REGISTER, REGISTER]},
+    Instruction{opcode = DIV, operands = [REGISTER, REGISTER, REGISTER]},
+    Instruction{opcode = DIVU, operands = [REGISTER, REGISTER, REGISTER]},
+    Instruction{opcode = MULT, operands = [REGISTER, REGISTER]},
+    Instruction{opcode = MULTU, operands = [REGISTER, REGISTER, REGISTER]},
+    Instruction{opcode = AND, operands = [REGISTER, REGISTER, REGISTER]},
+    Instruction{opcode = ANDI, operands = [REGISTER, REGISTER, IMMEDIATE]},
+    Instruction{opcode = OR, operands = [REGISTER, REGISTER, REGISTER]},
+    Instruction{opcode = ORI, operands = [REGISTER, REGISTER, IMMEDIATE]},
+    Instruction{opcode = J, operands = [ADDRESS]},
+    Instruction{opcode = JALR, operands = [ADDRESS]},
+    Instruction{opcode = JR, operands = [REGISTER]}
+  ]
 
 -- enum for all opcodes (NOTE: Order here matters, don't change)
 data Opcode = ADD  -- R Type Instructions
@@ -64,7 +90,7 @@ data Opcode = ADD  -- R Type Instructions
             | JAL  
             | J
             | JR
-            deriving(Enum, Show, Read, Eq, Ord)
+            deriving(Enum, Show, Read, Eq, Ord, Bounded)
 
 -- Registers Enum
 data Register = ZERO   
@@ -151,10 +177,10 @@ registerToBinary op = case op of
                     AT -> "100001"
                     V0 -> "001000"
                     V1 -> "001001"
-                    A0-> "100100"
-                    A1  -> "001100"
+                    A0 -> "100100"
+                    A1 -> "001100"
                     A2 -> "011010"
-                    A3  -> "011011"
+                    A3 -> "011011"
                     T0 -> "011000"
                     T1 -> "011001" 
                     T2 -> "011001"
@@ -195,6 +221,10 @@ isOpcode op = case toOpcode op of
 -- Converts string from scanner into register enum
 toRegister :: String -> Register
 toRegister register = read $ map toUpper register
+
+
+isDirective :: String -> Bool
+isDirective str = str `elem` directives
 
 -- Note: add custom error for when string to enum conversion fails
 -- to find an existing register or opcode 

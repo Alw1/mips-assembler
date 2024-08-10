@@ -22,13 +22,12 @@ main = do
     -- Starting address of memory
     let startAddress = 0x010
 
-    let tokenStream = filter (not . null) (map tokenize (lines file))
+    let tokenStream = map tokenize (lines file)
 
-    let temp = map (assignMemory startAddress) tokenStream 
+    let temp = filter(not.null) $ assignMemory startAddress tokenStream
 
     -- Parse & generate code
     let parser = map parseMIPS temp
-
 
     putStrLn "\n\nToken Stream"
     printLines temp

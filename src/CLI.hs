@@ -20,7 +20,7 @@ optionsParser = Options
      <> metavar "output-file"
      <> help "Name of output file"
      <> showDefault
-     <> value "output.txt" )
+     <> value "output.bin" )
   <*> switch
       ( long "debug"
      <> help "debug flag")
