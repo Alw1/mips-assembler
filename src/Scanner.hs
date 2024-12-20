@@ -1,8 +1,8 @@
 module Scanner where
 
 import Data.Char (isDigit, isAlpha, isAlphaNum, isSpace)
-import Instructions 
 import Text.Printf (printf)
+import Instructions 
 
 data Token =  LabelTok String
             | DirectiveTok String --Maybe(String) -- directive argument
@@ -15,13 +15,13 @@ data Token =  LabelTok String
 tokenize :: String -> [Token]
 tokenize [] = []
 tokenize line@(x:xs)
-    | isDigit x = tokenizeNumber line
-    | isAlpha x = tokenizeLabel line
-    | isSpace x || x == ',' = tokenize xs -- ignores whitespace & commas
-    | x == '#' || x == ';' = tokenize []              -- ignore line if its a comment
-    | x == '$' = tokenizeRegister xs
-    | x == '.' = tokenizeDirective xs
-    | otherwise = error $ "[Scanner Error] Unexpected input in line" ++ line
+   | isDigit x = tokenizeNumber line
+   | isAlpha x = tokenizeLabel line
+   | isSpace x || x == ',' = tokenize xs -- ignore whitespace & commas
+   | x == '#' || x == ';' = tokenize []  -- ignore line if its a comment
+   | x == '$' = tokenizeRegister xs
+   | x == '.' = tokenizeDirective xs
+   | otherwise = error $ "[Scanner Error] Unexpected input in line" ++ line
 
 tokenizeRegister :: String -> [Token]
 tokenizeRegister [] = []
